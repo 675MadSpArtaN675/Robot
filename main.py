@@ -5,6 +5,7 @@ import re
 import pyautogui as pag
 import pyperclip as ppc
 import psutil as pu
+import pyinputplus as pyip
 
 
 SCREEN_WIDTH = 1920
@@ -135,8 +136,11 @@ def ClickButton(x: int, y: int):
 
 
 def OpenMaster(process_need: str):
-    priemka_number = "38"
-    save_mode = Methods.HTML
+    priemka_number = pyip.inputStr(
+        "Введите номер приемной компании без передних нулей: ", strip=True
+    )  # "38"
+    save_mode = pyip.inputChoice(["html", "xls", "reg_1", "reg_2"])
+    print("Бот заработает через 5 секунд. Откройте 1С...")  # Methods.HTML
 
     process = FindProcess(process_need)
 
