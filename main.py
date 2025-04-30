@@ -4,6 +4,7 @@ import pyautogui as pag
 import pyperclip as ppc
 import psutil as pu
 
+
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
 
@@ -17,6 +18,14 @@ def FindImage(image_path: str):
 
     except pag.ImageNotFoundException:
         return None
+
+
+def FindAnyImages(image_paths: list[str]):
+    for image_path in image_paths:
+        image = FindImage(image_path)
+
+        if image is not None:
+            return image
 
 
 def FindProcess(name: str):
@@ -39,6 +48,15 @@ def FindImageAndClick(image_path: str):
     return
 
 
+def ClickYesButton():
+    coordinates = FindImage("yes_1.png"), FindImage("yes_2.png")
+
+    if (coordinates[0] is not None) or (coordinates[1] is not None):
+        pag.press("enter")
+
+    return
+
+
 def CenterCursor():
     pag.moveTo(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
 
@@ -48,14 +66,19 @@ def FindItemInList(item_name: str):
 
     found = False
     name = ""
+    prev = ""
     while not found:
+        prev = name
         pag.press("down")
-        pag.hotkey("ctrl", "c")
+        pag.hotkey(["ctrl", "c"])
 
         name = ppc.paste()
 
         if re.search(item_name.strip(), name.strip(), re.IGNORECASE):
             found = True
+            break
+
+        if name == prev:
             break
 
     return found
@@ -65,7 +88,7 @@ def WaitProcess(process: pu.Process):
     process_percent = process.cpu_percent()
 
     while process_percent := process.cpu_percent(3):
-        pag.sleep(1.5)
+        pag.sleep(1)
 
     return
 
@@ -85,7 +108,8 @@ def ClickButton(x: int, y: int):
 
 
 def OpenMaster(process_need: str):
-    priemka_number = "48"
+    priemka_number = "38"
+
     process = FindProcess(process_need)
 
     FindImageAndClick("priemka_button.png")
@@ -95,8 +119,8 @@ def OpenMaster(process_need: str):
     pag.moveTo(1819, 82, duration=0.5)
     pag.click()
 
+    pag.sleep(0.75)
     FindImageAndClick("choose_variants.png")
-
     pag.sleep(2)
 
     coordinate = (SCREEN_WIDTH // 2 - 25, SCREEN_HEIGHT // 2)
@@ -113,15 +137,28 @@ def OpenMaster(process_need: str):
     pag.press("delete")
 
     FindImageAndClick("add_button.png")
-    FindImageAndClick("display_all.png")
 
-    pag.sleep(1.5)
+    pag.sleep(0.75)
+    FindImageAndClick("display_all_1.png")
+
+    pag.sleep(0.75)
     FindImageAndClick("success_icon.png")
 
     pag.sleep(2.5)
     pag.press("home")
 
     FindItemInList(priemka_number)
+    pag.press("enter")
+
+    FindImageAndClick("OK_button.png")
+    ClickYesButton()
+
+    FindImageAndClick("OK_but.png")
+
+    ClickButton(1255, 153)
+
+    pag.sleep(1.25)
+    ClickButton(365, 230)
 
 
 def main():
