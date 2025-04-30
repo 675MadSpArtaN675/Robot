@@ -135,12 +135,25 @@ def ClickButton(x: int, y: int):
     return
 
 
+def ChooseSaveMode(input_str: str):
+    if input_str == "html":
+        return Methods.HTML
+    elif input_str == "xls":
+        return Methods.XLS
+    elif input_str == "reg_1":
+        return Methods.Registry_1
+    elif input_str == "reg_2":
+        return Methods.Registry_2
+
+
 def OpenMaster(process_need: str):
     priemka_number = pyip.inputStr(
         "Введите номер приемной компании без передних нулей: ", strip=True
-    )  # "38"
-    save_mode = pyip.inputChoice(["html", "xls", "reg_1", "reg_2"])
-    print("Бот заработает через 5 секунд. Откройте 1С...")  # Methods.HTML
+    )
+    save_mode = pyip.inputChoice(
+        ["html", "xls", "reg_1", "reg_2"], applyFunc=ChooseSaveMode
+    )
+    print("Бот заработает через 5 секунд. Откройте 1С...")
 
     process = FindProcess(process_need)
 
