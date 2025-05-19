@@ -211,7 +211,7 @@ def ParseCommandLineArgs():
     
     parser.add_argument("priemka_number", type=int)
     parser.add_argument("save_mode", type=str, default="html")
-    parser.add_argument("--need_choose_variant", type=bool, action="store_true")
+    parser.add_argument("--need_choose_variant", action="store_true")
     
     return parser.parse_args()
 
@@ -235,7 +235,6 @@ def OpenMaster(process_need: str, priemka_number: str, save_mode: str, choose_va
        chooseVariant(process) 
 
     ChoosePriemka(priemka_number)
-
     FormatActivate(process)
     
     pag.sleep(1.5)
