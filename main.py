@@ -1,5 +1,5 @@
 from enum import Enum
-
+import argparse as ap
 import re
 
 import pyautogui as pag
@@ -149,38 +149,7 @@ def ChooseSaveMode(input_str: str):
         return Methods.Registry_2
 
 
-def OpenMaster(process_need: str):
-    priemka_number = pyip.inputStr(
-        "Введите номер приемной компании без передних нулей: ", strip=True
-    )
-    save_mode = pyip.inputChoice(
-        ["html", "xls", "reg_1", "reg_2"], applyFunc=ChooseSaveMode
-    )
-    print("Бот заработает через 5 секунд. Откройте 1С...")
-
-    process = FindProcess(process_need)
-
-    pag.sleep 2.25
-    FindImageAndClick("priemka_button.png")
-    pag.sleep 2.25
-    FindImageAndClick("List_master_button.png")
-
-    pag.sleep(5)
-    pag.moveTo(1819, 82, duration=0.5)
-    pag.click()
-
-    pag.sleep(0.75)
-    FindImageAndClick("choose_variants.png")
-    pag.sleep(2)
-
-    coordinate = (SCREEN_WIDTH // 2 - 25, SCREEN_HEIGHT // 2)
-    ClickButton(*coordinate)
-    WaitProcess(process)
-
-    pag.press("home")
-    if FindItemInList("Список 1 этап"):
-        pag.press("enter")
-
+def ChoosePriemka(priemka_number):
     ClickButton(1129, 124)
 
     pag.sleep(0.75)
@@ -200,9 +169,75 @@ def OpenMaster(process_need: str):
 
     FindImageAndClick("OK_button.png")
     ClickYesButton()
-
+    
     FindImageAndClick("OK_but.png")
+    
+    
+def chooseVariant(process : pu.Process):
+    pag.sleep(0.75)
+    FindImageAndClick("choose_variants.png")
+    
+    pag.sleep(2)
 
+    coordinate = (SCREEN_WIDTH // 2 - 25, SCREEN_HEIGHT // 2)
+    ClickButton(*coordinate)
+    WaitProcess(process)
+
+    pag.press("home")
+    if FindItemInList("Список 1 этап"):
+        pag.press("enter")
+        
+    return
+
+def FormatActivate(process : pu.Process):
+    ClickButton(494, 155)
+    
+    format_activate = FindImage("check_foramt_list_1.jpg")
+    
+    pag.moveTo(*format_activate)
+    pag.move(175, 0)
+    
+    pag.sleep(2.25)
+    pag.click()
+    
+    pag.sleep(0.75)
+    FindImageAndClick("create_button.jpg")
+    WaitProcess(process)
+
+
+def ParseCommandLineArgs():
+    parser = ap.ArgumentParser("create_concurce_spiski")
+    
+    parser.add_argument("priemka_number", type=int)
+    parser.add_argument("save_mode", type=str, default="html")
+    parser.add_argument("--need_choose_variant", type=bool, action="store_true")
+    
+    return parser.parse_args()
+
+
+def OpenMaster(process_need: str, priemka_number: str, save_mode: str, choose_variant: bool = False):
+    save_mode = ChooseSaveMode(save_mode)
+    print("Бот заработает через 5 секунд. Откройте 1С...")
+
+    process = FindProcess(process_need)
+
+    pag.sleep(2.25)
+    FindImageAndClick("priemka_button.png")
+    pag.sleep(2.25)
+    FindImageAndClick("List_master_button.png")
+
+    pag.sleep(5)
+    pag.moveTo(1819, 82, duration=0.5)
+    pag.click()
+
+    if choose_variant:
+       chooseVariant(process) 
+
+    ChoosePriemka(priemka_number)
+
+    FormatActivate(process)
+    
+    pag.sleep(1.5)
     pag.sleep(0.5)
     ClickButton(547, 81)
 
@@ -218,8 +253,11 @@ def OpenMaster(process_need: str):
     pag.sleep(2)
 
 
+
+
 def main():
-    OpenMaster("1cv8c")
+    arguments = ParseCommandLineArgs()
+    OpenMaster("1cv8c", arguments.priemka_number, arguments.save_mode, arguments.need_choose_variant)
 
 
 if __name__ == "__main__":
