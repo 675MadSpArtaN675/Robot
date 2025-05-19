@@ -253,8 +253,6 @@ def OpenMaster(process_need: str, priemka_number: str, save_mode: str, choose_va
     pag.sleep(2)
 
 
-
-
 def main():
     arguments = ParseCommandLineArgs()
     OpenMaster("1cv8c", arguments.priemka_number, arguments.save_mode, arguments.need_choose_variant)
