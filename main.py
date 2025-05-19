@@ -113,11 +113,14 @@ def ChooseSaveMethod(method_number: Methods):
 
 
 def WaitProcess(process: pu.Process):
-    process_percent = process.cpu_percent()
+    process_percent = process.cpu_percent(3)
 
     while process_percent := process.cpu_percent(3):
-        pag.sleep(1)
-
+        if process_percent > 1:
+            pag.sleep(1)
+        else:
+            break
+    
     return
 
 
@@ -157,7 +160,9 @@ def OpenMaster(process_need: str):
 
     process = FindProcess(process_need)
 
+    pag.sleep 2.25
     FindImageAndClick("priemka_button.png")
+    pag.sleep 2.25
     FindImageAndClick("List_master_button.png")
 
     pag.sleep(5)
@@ -178,7 +183,7 @@ def OpenMaster(process_need: str):
 
     ClickButton(1129, 124)
 
-    pag.sleep(2.5)
+    pag.sleep(0.75)
     pag.press("delete")
 
     FindImageAndClick("add_button.png")
