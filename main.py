@@ -260,13 +260,8 @@ def OpenMaster(process_need: str, priemka_number: str, save_mode: str, choose_va
 
     pag.sleep(2)
 
-def ReserveHandler():
-    sys.exit()
-    return
-
 def main():
     arguments = ParseCommandLineArgs()
-    kb.add_hotkey("ctrl+l", ReserveHandler)
     
     for number in arguments.priemka_number:
         OpenMaster("1cv8c", str(number), arguments.save_mode, arguments.need_choose_variant)
