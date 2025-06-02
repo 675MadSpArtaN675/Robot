@@ -1,4 +1,6 @@
 from enum import Enum
+import sys
+from time import sleep
 
 import argparse as ap
 import re
@@ -7,6 +9,7 @@ import pyautogui as pag
 import pyperclip as ppc
 import psutil as pu
 import pyinputplus as pyip
+import keyboard as kb
 
 
 SCREEN_WIDTH = 1920
@@ -175,6 +178,9 @@ def ChoosePriemka(priemka_number):
     
     
 def chooseVariant(process : pu.Process):
+    pag.moveTo(1819, 82, duration=0.5)
+    pag.click()
+    
     pag.sleep(0.75)
     FindImageAndClick("choose_variants.png")
     
@@ -213,7 +219,7 @@ def FormatActivate(process : pu.Process):
 def ParseCommandLineArgs():
     parser = ap.ArgumentParser("create_concurce_spiski")
     
-    parser.add_argument("priemka_number", type=int)
+    parser.add_argument("priemka_number", type=str, nargs='+')
     parser.add_argument("save_mode", type=str, default="html")
     parser.add_argument("--need_choose_variant", action="store_true")
     
@@ -232,8 +238,6 @@ def OpenMaster(process_need: str, priemka_number: str, save_mode: str, choose_va
     FindImageAndClick("List_master_button.png")
 
     pag.sleep(5)
-    pag.moveTo(1819, 82, duration=0.5)
-    pag.click()
 
     if choose_variant:
        chooseVariant(process) 
@@ -256,10 +260,17 @@ def OpenMaster(process_need: str, priemka_number: str, save_mode: str, choose_va
 
     pag.sleep(2)
 
+def ReserveHandler():
+    sys.exit()
+    return
 
 def main():
     arguments = ParseCommandLineArgs()
-    OpenMaster("1cv8c", str(arguments.priemka_number), arguments.save_mode, arguments.need_choose_variant)
+    kb.add_hotkey("ctrl+l", ReserveHandler)
+    
+    for number in arguments.priemka_number:
+        OpenMaster("1cv8c", str(number), arguments.save_mode, arguments.need_choose_variant)
+        sleep(5)
 
 
 if __name__ == "__main__":
