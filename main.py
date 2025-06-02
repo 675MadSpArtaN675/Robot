@@ -193,16 +193,20 @@ def chooseVariant(process : pu.Process):
 def FormatActivate(process : pu.Process):
     ClickButton(494, 155)
     
-    format_activate = FindImage("check_foramt_list_1.jpg")
+    format_activate = FindImage("check_format_list_1.jpg")
     
-    pag.moveTo(*format_activate)
-    pag.move(175, 0)
-    
-    pag.sleep(2.25)
-    pag.click()
-    
-    pag.sleep(0.75)
-    FindImageAndClick("create_button.jpg")
+    if (format_activate is not None):
+        format_activate = FindImage("check_format_list_2.png")
+
+        pag.moveTo(*format_activate )
+        pag.move(175, 0)
+        
+        pag.sleep(2.25)
+        pag.click()
+        
+        pag.sleep(0.75)
+        FindImageAndClick("create_button.jpg")
+
     WaitProcess(process)
 
 
@@ -255,7 +259,7 @@ def OpenMaster(process_need: str, priemka_number: str, save_mode: str, choose_va
 
 def main():
     arguments = ParseCommandLineArgs()
-    OpenMaster("1cv8c", arguments.priemka_number, arguments.save_mode, arguments.need_choose_variant)
+    OpenMaster("1cv8c", str(arguments.priemka_number), arguments.save_mode, arguments.need_choose_variant)
 
 
 if __name__ == "__main__":
