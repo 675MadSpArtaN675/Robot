@@ -77,7 +77,9 @@ def ClickYesButton():
     if (coordinates[0] is not None) or (coordinates[1] is not None):
         pag.press("enter")
 
+
     return
+
 
 
 def CenterCursor():
@@ -85,8 +87,6 @@ def CenterCursor():
 
 
 def FindItemInList(item_name: str):
-    pag.hotkey("home")
-
     found = False
     name = ""
     prev = ""
@@ -96,8 +96,9 @@ def FindItemInList(item_name: str):
         pag.hotkey(["ctrl", "c"])
 
         name = ppc.paste()
+        compare = re.search(item_name.strip(), name.strip(), re.IGNORECASE)
 
-        if re.search(item_name.strip(), name.strip(), re.IGNORECASE):
+        if compare:
             found = True
             break
 
@@ -106,6 +107,14 @@ def FindItemInList(item_name: str):
 
     return found
 
+
+def OpenMasterPriemka():
+    pag.sleep(2.25)
+    FindImageAndClick("priemka_button.png")
+    pag.sleep(2.25)
+    FindImageAndClick("List_master_button.png")
+
+    pag.sleep(5)
 
 def ChooseSaveMethod(method_number: Methods):
     for _ in range(method_number):
@@ -152,8 +161,19 @@ def ChooseSaveMode(input_str: str):
     elif input_str == "reg_2":
         return Methods.Registry_2
 
+def AddPriemkas(priemka_number : list[int]):
+    pag.hotkey("home")
 
-def ChoosePriemka(priemka_number):
+    for number in priemka_number:
+        if FindItemInList(str(number)):
+            sleep(1)
+            pag.press("enter")
+
+        sleep(0.75)
+
+    pag.hotkey("alt", "f4")
+
+def ChoosePriemka(priemka_number : list[int]):
     ClickButton(1129, 124)
 
     pag.sleep(0.75)
@@ -167,9 +187,7 @@ def ChoosePriemka(priemka_number):
     pag.sleep(2.5)
     pag.press("home")
 
-    FindItemInList(priemka_number)
-    pag.press("enter")
-    pag.hotkey("alt", "f4")
+    AddPriemkas(priemka_number)
 
     FindImageAndClick("OK_button.png")
     ClickYesButton()
@@ -198,16 +216,13 @@ def chooseVariant(process : pu.Process):
 
 def FormatActivate(process : pu.Process):
     ClickButton(494, 155)
-    
-    format_activate = FindImage("check_format_list_1.jpg")
-    
-    if (format_activate is not None):
-        format_activate = FindImage("check_format_list_2.png")
 
-        pag.moveTo(*format_activate )
-        pag.move(175, 0)
+    format_activate = FindImage("check_format_list_3.png")
+
+    if (format_activate is None):
+        pag.moveTo(671, 308)
         
-        pag.sleep(2.25)
+        pag.sleep(0.5)
         pag.click()
         
         pag.sleep(0.75)
@@ -225,33 +240,14 @@ def ParseCommandLineArgs():
     
     return parser.parse_args()
 
-
-def OpenMaster(process_need: str, priemka_number: str, save_mode: str, choose_variant: bool = False):
-    save_mode = ChooseSaveMode(save_mode)
-    print("Бот заработает через 5 секунд. Откройте 1С...")
-
-    process = FindProcess(process_need)
-
-    pag.sleep(2.25)
-    FindImageAndClick("priemka_button.png")
-    pag.sleep(2.25)
-    FindImageAndClick("List_master_button.png")
-
-    pag.sleep(5)
-
-    if choose_variant:
-       chooseVariant(process) 
-
-    ChoosePriemka(priemka_number)
-    FormatActivate(process)
-    
-    pag.sleep(1.5)
-    pag.sleep(0.5)
+def SaveInfo(save_mode: str):
+    pag.sleep(2)
     ClickButton(547, 81)
 
     pag.sleep(0.75)
     ChooseSaveMethod(save_mode.value)
 
+def UnloadMCP():
     pag.sleep(0.75)
     ClickButton(1255, 153)
 
@@ -260,12 +256,28 @@ def OpenMaster(process_need: str, priemka_number: str, save_mode: str, choose_va
 
     pag.sleep(2)
 
+def OpenMaster(process_need: str, priemka_number: list[int] | str, save_mode: str, choose_variant: bool = False):
+    save_mode = ChooseSaveMode(save_mode)
+    print("Бот заработает через 5 секунд. Откройте 1С...")
+
+    process = FindProcess(process_need)
+
+    OpenMasterPriemka()
+
+    if choose_variant:
+       chooseVariant(process) 
+
+    ChoosePriemka(priemka_number)
+    FormatActivate(process)
+    
+    SaveInfo(save_mode)
+    UnloadMCP()
+    
+
 def main():
     arguments = ParseCommandLineArgs()
     
-    for number in arguments.priemka_number:
-        OpenMaster("1cv8c", str(number), arguments.save_mode, arguments.need_choose_variant)
-        sleep(5)
+    OpenMaster("1cv8c", arguments.priemka_number, arguments.save_mode, arguments.need_choose_variant)
 
 
 if __name__ == "__main__":
