@@ -247,7 +247,7 @@ def ParseCommandLineArgs():
     parser.add_argument("priemka_number", type=str, nargs='+')
     parser.add_argument("save_mode", type=str, default="html")
     parser.add_argument("--need_choose_variant", action="store_true")
-    parser.add_argument("--mcp", action="store_true")
+    parser.add_argument("--force", action="store_true")
 
     return parser.parse_args()
 
@@ -293,13 +293,15 @@ def OpenMaster(process_need: str, priemka_number: list[int] | str, save_mode: st
 
 def main():
     arguments = ParseCommandLineArgs()
-    
-    start_arguments = ["1cv8c", arguments.priemka_number, arguments.save_mode]
-    OpenMaster(*start_arguments, True, choose_variant = arguments.need_choose_variant)
+    now_time = dt.time().now()
 
-    today_date = dt.date.today()
-    if (today_date >= dt.date(today_date.year(), 7, 27)):
-        OpenMaster(*start_arguments, False, choose_variant = arguments.need_choose_variant)
+    if (now_time < dt.time(17, 30) or arguments.force):
+        start_arguments = ["1cv8c", arguments.priemka_number, arguments.save_mode]
+        OpenMaster(*start_arguments, True, choose_variant = arguments.need_choose_variant)
+
+        today_date = dt.date.today()
+        if (today_date >= dt.date(today_date.year(), 7, 27)):
+            OpenMaster(*start_arguments, False, choose_variant = arguments.need_choose_variant)
 
 
 if __name__ == "__main__":
