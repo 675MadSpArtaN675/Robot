@@ -11,6 +11,8 @@ import psutil as pu
 import pyinputplus as pyip
 import keyboard as kb
 
+import datetime as dt
+
 
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
@@ -177,7 +179,9 @@ def ChoosePriemka(priemka_number : list[int]):
     ClickButton(1129, 124)
 
     pag.sleep(0.75)
-    pag.press("delete")
+    for _ in range(20):
+        pag.press("delete")
+        pag.sleep(0.1)
 
     FindImageAndClick("add_button.png")
 
@@ -214,19 +218,25 @@ def chooseVariant(process : pu.Process):
         
     return
 
-def FormatActivate(process : pu.Process):
+def ToggleCheck():
+    pag.moveTo(671, 308)
+    
+    pag.sleep(0.5)
+    pag.click()
+    
+    pag.sleep(0.75)
+    FindImageAndClick("create_button.jpg")
+
+def FormatActivate(process : pu.Process, mcp :bool):
     ClickButton(494, 155)
 
-    format_activate = FindImage("check_format_list_3.png")
+    for _ in range(4):
+        format_activate = FindAnyImages(["check_format_list_2.png", "check_format_list_3.png"])
 
-    if (format_activate is None):
-        pag.moveTo(671, 308)
-        
-        pag.sleep(0.5)
-        pag.click()
-        
-        pag.sleep(0.75)
-        FindImageAndClick("create_button.jpg")
+        if mcp and format_activate is not None:
+            ToggleCheck()
+        elif not mcp and format_activate is None:
+            ToggleCheck()
 
     WaitProcess(process)
 
@@ -237,7 +247,8 @@ def ParseCommandLineArgs():
     parser.add_argument("priemka_number", type=str, nargs='+')
     parser.add_argument("save_mode", type=str, default="html")
     parser.add_argument("--need_choose_variant", action="store_true")
-    
+    parser.add_argument("--mcp", action="store_true")
+
     return parser.parse_args()
 
 def SaveInfo(save_mode: str):
@@ -256,7 +267,9 @@ def UnloadMCP():
 
     pag.sleep(2)
 
-def OpenMaster(process_need: str, priemka_number: list[int] | str, save_mode: str, choose_variant: bool = False):
+
+
+def OpenMaster(process_need: str, priemka_number: list[int] | str, save_mode: str, mcp :bool = True, choose_variant: bool = False):
     save_mode = ChooseSaveMode(save_mode)
     print("Бот заработает через 5 секунд. Откройте 1С...")
 
@@ -268,16 +281,25 @@ def OpenMaster(process_need: str, priemka_number: list[int] | str, save_mode: st
        chooseVariant(process) 
 
     ChoosePriemka(priemka_number)
-    FormatActivate(process)
+
+    FormatActivate(process, mcp)
     
-    SaveInfo(save_mode)
-    UnloadMCP()
+    if mcp:
+        UnloadMCP()
+
+    else:
+        SaveInfo(save_mode)
     
 
 def main():
     arguments = ParseCommandLineArgs()
     
-    OpenMaster("1cv8c", arguments.priemka_number, arguments.save_mode, arguments.need_choose_variant)
+    start_arguments = ["1cv8c", arguments.priemka_number, arguments.save_mode]
+    OpenMaster(*start_arguments, True, choose_variant = arguments.need_choose_variant)
+
+    today_date = dt.date.today()
+    if (today_date >= dt.date(today_date.year(), 7, 27)):
+        OpenMaster(*start_arguments, False, choose_variant = arguments.need_choose_variant)
 
 
 if __name__ == "__main__":
