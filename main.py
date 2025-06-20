@@ -254,6 +254,12 @@ def ParseCommandLineArgs():
 
     return parser.parse_args()
 
+def PerformData(process : pu.Process):
+    pag.moveTo(317, 88)
+    pag.click()
+
+    WaitProcess(process)
+
 def SaveInfo(save_mode: str):
     pag.sleep(2)
     ClickButton(547, 81)
@@ -286,7 +292,8 @@ def OpenMaster(process_need: str, priemka_number: list[int] | str, save_mode: st
     ChoosePriemka(priemka_number)
 
     FormatActivate(process, mcp)
-    
+    PerformData(process)
+
     if mcp:
         UnloadMCP()
 
@@ -296,14 +303,9 @@ def OpenMaster(process_need: str, priemka_number: list[int] | str, save_mode: st
 
 def main():
     arguments = ParseCommandLineArgs()
-    now_time = dt.datetime.now()
-    now = dt.datetime.strftime(now_time, '%H:%M:%S')
-    
-    
+    now_time = dt.datetime.now().time()
 
-    print(now)
-
-    if (now < '17:30:00' or arguments.force):
+    if (now_time < dt.time(17, 30, 00) or arguments.force):
         start_arguments = ["1cv8c", arguments.priemka_number, arguments.save_mode]
         OpenMaster(*start_arguments, True, choose_variant = arguments.need_choose_variant)
 
