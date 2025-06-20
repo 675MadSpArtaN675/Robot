@@ -11,6 +11,7 @@ import psutil as pu
 import pyinputplus as pyip
 import keyboard as kb
 
+
 import datetime as dt
 
 
@@ -89,6 +90,8 @@ def CenterCursor():
 
 
 def FindItemInList(item_name: str):
+    item_name = re.sub(r"[,.\s]", "", item_name.strip()).strip()
+
     found = False
     name = ""
     prev = ""
@@ -168,7 +171,7 @@ def AddPriemkas(priemka_number : list[int]):
 
     for number in priemka_number:
         if FindItemInList(str(number)):
-            sleep(1)
+            sleep(0.25)
             pag.press("enter")
 
         sleep(0.75)
@@ -293,9 +296,14 @@ def OpenMaster(process_need: str, priemka_number: list[int] | str, save_mode: st
 
 def main():
     arguments = ParseCommandLineArgs()
-    now_time = dt.time().now()
+    now_time = dt.datetime.now()
+    now = dt.datetime.strftime(now_time, '%H:%M:%S')
+    
+    
 
-    if (now_time < dt.time(17, 30) or arguments.force):
+    print(now)
+
+    if (now < '17:30:00' or arguments.force):
         start_arguments = ["1cv8c", arguments.priemka_number, arguments.save_mode]
         OpenMaster(*start_arguments, True, choose_variant = arguments.need_choose_variant)
 
