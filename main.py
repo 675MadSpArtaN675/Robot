@@ -131,14 +131,14 @@ def ChooseSaveMethod(method_number: Methods):
 
 
 def WaitProcess(process: pu.Process):
-    process_percent = process.cpu_percent(3)
+    process_percent = process.cpu_percent(6)
 
-    while process_percent := process.cpu_percent(3):
-        if process_percent > 1:
-            pag.sleep(1)
-        else:
-            break
+    while (process_percent := process.cpu_percent(6)) >= 1:
+        if process_percent >= 1:
+            print("Ожидаем!")
     
+    print("Ожидание окончено!")
+    pag.sleep(5)
     return
 
 
@@ -178,8 +178,10 @@ def AddPriemkas(priemka_number : list[int]):
 
     pag.hotkey("alt", "f4")
 
-def ChoosePriemka(priemka_number : list[int]):
-    ClickButton(1129, 124)
+def ChoosePriemka(process : pu.Process, priemka_number : list[int]):
+    ClickButton(1134, 121)
+    ClickButton(1171, 144)
+    pag.press("f4")
 
     pag.sleep(0.75)
     for _ in range(20):
@@ -200,6 +202,7 @@ def ChoosePriemka(priemka_number : list[int]):
     ClickYesButton()
     
     FindImageAndClick("OK_but.png")
+    WaitProcess(process)
     
     
 def chooseVariant(process : pu.Process):
@@ -262,17 +265,17 @@ def PerformData(process : pu.Process):
 
 def SaveInfo(save_mode: str):
     pag.sleep(2)
-    ClickButton(547, 81)
+    ClickButton(543, 85)
 
     pag.sleep(0.75)
     ChooseSaveMethod(save_mode.value)
 
 def UnloadMCP():
     pag.sleep(0.75)
-    ClickButton(1255, 153)
+    ClickButton(1321, 158)
 
     pag.sleep(1.25)
-    ClickButton(365, 230)
+    ClickButton(369, 233)
 
     pag.sleep(2)
 
@@ -289,7 +292,7 @@ def OpenMaster(process_need: str, priemka_number: list[int] | str, save_mode: st
     if choose_variant:
        chooseVariant(process) 
 
-    ChoosePriemka(priemka_number)
+    ChoosePriemka(process, priemka_number)
 
     FormatActivate(process, mcp)
     PerformData(process)
@@ -305,7 +308,7 @@ def main():
     arguments = ParseCommandLineArgs()
     now_time = dt.datetime.now().time()
 
-    if (now_time < dt.time(17, 30, 00) or arguments.force):
+    if (now_time <= dt.time(17, 30, 00) or arguments.force):
         start_arguments = ["1cv8c", arguments.priemka_number, arguments.save_mode]
         OpenMaster(*start_arguments, True, choose_variant = arguments.need_choose_variant)
 
