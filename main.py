@@ -130,10 +130,13 @@ def ChooseSaveMethod(method_number: Methods):
 
 def WaitProcess(process: pu.Process):
     process_percent = process.cpu_percent(6)
+    prev_process_percent = 2
 
     while (process_percent := process.cpu_percent(6)) >= 1:
-        if process_percent >= 1:
+        if process_percent >= 1 and prev_process_percent >= 1:
             print("Ожидаем!")
+
+        prev_process_percent = process_percent
     
     print("Ожидание окончено!")
     pag.sleep(5)
