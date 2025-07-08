@@ -139,6 +139,7 @@ def WaitProcess(process: pu.Process):
         prev_process_percent = process_percent
     
     print("Ожидание окончено!")
+
     pag.sleep(5)
     return
 
