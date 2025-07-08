@@ -11,7 +11,6 @@ import psutil as pu
 import pyinputplus as pyip
 import keyboard as kb
 
-
 import datetime as dt
 
 
@@ -79,7 +78,6 @@ def ClickYesButton():
 
     if (coordinates[0] is not None) or (coordinates[1] is not None):
         pag.press("enter")
-
 
     return
 
@@ -254,6 +252,7 @@ def ParseCommandLineArgs():
     parser.add_argument("save_mode", type=str, default="html")
     parser.add_argument("--need_choose_variant", action="store_true")
     parser.add_argument("--force", action="store_true")
+    parser.add_argument("--create_priemkas_list", action="store_true")
 
     return parser.parse_args()
 
@@ -281,7 +280,7 @@ def UnloadMCP():
 
 
 
-def OpenMaster(process_need: str, priemka_number: list[int] | str, save_mode: str, mcp :bool = True, choose_variant: bool = False):
+def OpenMaster(process_need: str, priemka_number: list[int] | str, save_mode: str, mcp :bool = True, choose_variant: bool = False, p_list_need : bool = False):
     save_mode = ChooseSaveMode(save_mode)
     print("Бот заработает через 5 секунд. Откройте 1С...")
 
@@ -292,7 +291,8 @@ def OpenMaster(process_need: str, priemka_number: list[int] | str, save_mode: st
     if choose_variant:
        chooseVariant(process) 
 
-    ChoosePriemka(process, priemka_number)
+    if p_list_need:
+        ChoosePriemka(process, priemka_number)
 
     FormatActivate(process, mcp)
     PerformData(process)
@@ -310,11 +310,11 @@ def main():
 
     if (now_time <= dt.time(17, 30, 00) or arguments.force):
         start_arguments = ["1cv8c", arguments.priemka_number, arguments.save_mode]
-        OpenMaster(*start_arguments, True, choose_variant = arguments.need_choose_variant)
+        OpenMaster(*start_arguments, True, choose_variant = arguments.need_choose_variant, p_list_need = arguments.create_priemkas_list)
 
         today_date = dt.date.today()
         if (today_date >= dt.date(today_date.year(), 7, 27)):
-            OpenMaster(*start_arguments, False, choose_variant = arguments.need_choose_variant)
+            OpenMaster(*start_arguments, False, choose_variant = arguments.need_choose_variant, p_list_need = arguments.create_priemkas_list)
 
 
 if __name__ == "__main__":
